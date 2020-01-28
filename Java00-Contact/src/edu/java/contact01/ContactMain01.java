@@ -8,6 +8,7 @@ public class ContactMain01 {
 	public static final int MENU_SELECT_ALL = 2;
 	public static final int MENU_SELECT = 3;
 	public static final int MENU_UPDATE = 4;
+	// ContactMain02에서 Menu 인터페이스로 분리
 
 	// 연락처 최대 저장 개수 - 상수
 	public static final int MAX = 100;
@@ -15,6 +16,7 @@ public class ContactMain01 {
 	public static Scanner sc = new Scanner(System.in);
 	public static Contact[] contactList = new Contact[MAX];
 	public static int count = 0; // 배열에 접근할 인덱스**
+	// 메소드에 필요한 변수를 ContactDAOImple로 분리
 
 	public static void main(String[] args) {
 
@@ -61,7 +63,7 @@ public class ContactMain01 {
 
 	} // end main()
 
-	// 메소드
+	// 메소드 -> ContactMain02에서 ContactDAOImple로 분리
 	// 연락처 등록
 	public static void insertContact(Scanner sc) {
 		if (count < contactList.length) {
