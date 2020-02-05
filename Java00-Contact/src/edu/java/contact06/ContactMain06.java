@@ -1,4 +1,4 @@
-package edu.java.contact05;
+package edu.java.contact06;
 
 import java.awt.*;
 import java.util.*;
@@ -7,7 +7,7 @@ import javax.swing.table.DefaultTableModel;
 
 import java.awt.event.*;
 
-public class ContactMain05 {
+public class ContactMain06 {
 
 	private JFrame frame;
 	private JTextField textName, textPhone, textEmail, textIndex;
@@ -25,7 +25,7 @@ public class ContactMain05 {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ContactMain05 window = new ContactMain05();
+					ContactMain06 window = new ContactMain06();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -34,7 +34,7 @@ public class ContactMain05 {
 		});
 	} // end main()
 
-	public ContactMain05() {
+	public ContactMain06() {
 		initialize();
 	}
 
@@ -42,12 +42,13 @@ public class ContactMain05 {
 		dao = ContactDAOImple.getInstance();
 
 		frame = new JFrame();
+		frame.setTitle("Contact Program");
 		frame.setBounds(100, 100, 700, 580);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
 		Font font = new Font("굴림", Font.BOLD, 32);
-		JLabel lblNewLabel = new JLabel("연락처 Version 0.5");
+		JLabel lblNewLabel = new JLabel("연락처 Version 0.6");
 		lblNewLabel.setFont(font);
 		lblNewLabel.setBounds(12, 10, 300, 45);
 		frame.getContentPane().add(lblNewLabel);
@@ -203,8 +204,8 @@ public class ContactMain05 {
 		String phone = textPhone.getText();
 		String email = textEmail.getText();
 
-		if (name.isEmpty() || phone.isEmpty() || email.isEmpty()) { // 세 항목 중 하나라도 비어있으면 실행
-			textChange.setText("빈 칸없이 모두 채워주세요.");
+		if (name.isEmpty()) { // 이름을 입력하지 않았으면
+			textChange.setText("이름은 반드시 입력해주세요.");
 			return; // 함수 종료
 		}
 
@@ -217,96 +218,79 @@ public class ContactMain05 {
 		} else {
 			textChange.setText("연락처 저장 실패");
 		}
+		clearTextFields();
 	} // end InsertContact()
 
 	private void selectContactByIndex() {
-		list = ((ContactDAOImple) dao).getList();
-
-		if (list.size() == 0) { // 연락처가 없다면 실행
-			textChange.setText("연락처를 등록하세요.");
-
-		} else { // 연락처가 1개라도 있다면 실행
-			try {
-				int index = Integer.parseInt(textIndex.getText());
-				if (index >= 0) {
-					ContactVO vo = dao.select(index);
-					if (vo != null) {
-						clearTextArea();
-						textResult.append("[" + index + "] 번째 연락처\n");
-						textResult.append(vo.toString() + "\n");
-					} else {
-						textChange.setText("해당하는 연락처가 없습니다.");
-					}
+		try {
+			int index = Integer.parseInt(textIndex.getText());
+			if (index >= 1) {
+				ContactVO vo = dao.select(index);
+				if (vo != null) {
+					clearTextArea();
+					textResult.append("[" + index + "] 번째 연락처\n");
+					textResult.append(vo.toString() + "\n");
 				} else {
-					textChange.setText("0 이상의 숫자를 입력하세요.");
+					textChange.setText("해당하는 연락처가 없습니다. 연락처를 등록하세요.");
 				}
-			} catch (Exception e1) {
-				textChange.setText("숫자를 입력하세요.");
+			} else {
+				textChange.setText("1 이상의 숫자를 입력하세요.");
 			}
+		} catch (Exception e1) {
+			textChange.setText("숫자를 입력하세요.");
 		}
 	} // end selectContactByIndex()
 
 	private void updateContact() {
-		list = ((ContactDAOImple) dao).getList();
+		try {
+			String name = textName.getText();
+			String phone = textPhone.getText();
+			String email = textEmail.getText();
 
-		if (list.size() == 0) { // 연락처가 없다면 실행
-			textChange.setText("연락처를 등록하세요.");
-
-		} else { // 연락처가 1개라도 있다면 실행
-			try {
-				String name = textName.getText();
-				String phone = textPhone.getText();
-				String email = textEmail.getText();
-
-				if (name.isEmpty() || phone.isEmpty() || email.isEmpty()) {
-					textChange.setText("빈 칸없이 모두 채워주세요.");
-					return;
-				}
-
-				int index = Integer.parseInt(textIndex.getText());
-				if (index >= 0) {
-					ContactVO vo = new ContactVO(name, phone, email);
-
-					int result = dao.update(index, vo);
-					if (result == 1) {
-						textChange.setText("연락처 수정 성공");
-					} else {
-						textChange.setText(index + "번 연락처가 존재하지 않습니다.");
-					}
-				} else {
-					textChange.setText("0 이상의 숫자를 입력하세요.");
-				}
-			} catch (Exception e1) {
-				textChange.setText("숫자를 입력하세요.");
+			if (name.isEmpty()) {
+				textChange.setText("이름은 반드시 입력해주세요.");
+				return;
 			}
+
+			int index = Integer.parseInt(textIndex.getText());
+			if (index >= 1) {
+				ContactVO vo = new ContactVO(name, phone, email);
+
+				int result = dao.update(index, vo);
+				if (result == 1) {
+					textChange.setText("연락처 수정 성공");
+				} else {
+					textChange.setText(index + "번 연락처가 존재하지 않습니다.");
+				}
+			} else {
+				textChange.setText("1 이상의 숫자를 입력하세요.");
+			}
+		} catch (Exception e1) {
+			textChange.setText("숫자를 입력하세요.");
 		}
+
 	} // end updateContact()
 
 	private void deleteContact() {
-		list = ((ContactDAOImple) dao).getList();
+		try {
+			int index = Integer.parseInt(textIndex.getText());
 
-		if (list.size() == 0) {
-			textChange.setText("연락처를 등록하세요.");
-		} else {
-			try {
-				int index = Integer.parseInt(textIndex.getText());
-
-				if (index >= 0 && index < list.size()) {
-					int result = dao.delete(index);
-					if (result == 1) {
-						textChange.setText("연락처 삭제 성공");
-					} else {
-						textChange.setText("연락처 삭제 실패");
-					}
-
+			if (index >= 1) {
+				int result = dao.delete(index);
+				if (result == 1) {
+					textChange.setText("연락처 삭제 성공");
 				} else {
-					textChange.setText("해당하는 연락처가 없습니다.");
+					textChange.setText(index + "번 연락처가 존재하지 않습니다.");
 				}
 
-			} catch (Exception e1) {
-				textChange.setText("숫자를 입력하세요");
+			} else {
+				textChange.setText("1 이상의 숫자를 입력하세요.");
 			}
+
+		} catch (Exception e1) {
+			textChange.setText("숫자를 입력하세요");
 		}
+
 	} // end deleteContact()
 
 	private void selectAllContact() {
@@ -319,10 +303,10 @@ public class ContactMain05 {
 		} else { // 연락처가 1개라도 있다면 실행
 			clearTextArea();
 			StringBuffer buffer = new StringBuffer();
-			
+
 			for (int i = 0; i < list.size(); i++) {
-				buffer.append(i + "번째 연락처\n" + list.get(i).toString() + "\n");
-				records[0] = i;
+				buffer.append((i+1) + "번째 연락처\n" + list.get(i).toString() + "\n");
+				records[0] = i+1;
 				records[1] = list.get(i).getName();
 				records[2] = list.get(i).getPhone();
 				records[3] = list.get(i).getEmail();
